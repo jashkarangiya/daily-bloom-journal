@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Navigation, NavTab } from "@/components/Navigation";
 import { YearGrid } from "@/components/YearGrid";
 import { TodayView } from "@/components/TodayView";
 import { IconGallery } from "@/components/IconGallery";
 import { JournalModal } from "@/components/JournalModal";
-import { DayInfo, initializeJournal, isToday, getDaysInYear } from "@/lib/journalData";
+import { DayInfo, initializeJournal, isToday, getDaysInYear, getJournalStats } from "@/lib/journalData";
+import { Button } from "@/components/ui/button";
+import { PenLine, Sprout } from "lucide-react";
 
 const Index: React.FC = () => {
   const [activeTab, setActiveTab] = useState<NavTab>("garden");
@@ -14,7 +16,6 @@ const Index: React.FC = () => {
 
   const currentYear = new Date().getFullYear();
 
-  // Initialize journal with sample data
   useEffect(() => {
     initializeJournal();
   }, []);
@@ -34,45 +35,86 @@ const Index: React.FC = () => {
   }, []);
 
   const handleSave = useCallback(() => {
-    // Force refresh of the grid
     setRefreshKey((prev) => prev + 1);
   }, []);
 
-  const handleTabChange = useCallback((tab: NavTab) => {
-    setActiveTab(tab);
-  }, []);
-
-  // Get fresh day data when refreshKey changes
-  const getTodayDayInfo = useCallback((): DayInfo | null => {
-    const days = getDaysInYear(currentYear);
-    return days.find((d) => isToday(d.date)) || null;
-  }, [currentYear, refreshKey]);
+  // Calculate stats for the header
+  const stats = useMemo(() => getJournalStats(currentYear), [currentYear, refreshKey]);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Main content */}
-      <main className="container max-w-4xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background text-foreground font-mono selection:bg-primary/20 flex flex-col">
+      {/* 1. NEW HEADER 
+         Replaces the floating stats pill. Anchors the top of the screen.
+      */}
+      <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-md border-b border-border/40">
+        <div className="container max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+          
+          {/* Left: Branding */}
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-bold tracking-tight text-primary">{currentYear}</h1>
+            <span className="hidden sm:inline-block text-muted-foreground text-sm">|</span>
+            <span className="hidden sm:inline-block text-sm font-medium text-foreground/80">
+              daily bloom
+            </span>
+          </div>
+
+          {/* Center: Stats (Hidden on tiny screens, shown on mobile/desktop) */}
+          <div className="text-xs font-mono text-muted-foreground hidden xs:block">
+            <span className="text-primary font-bold">{stats.written}</span> {stats.written === 1 ? 'memory' : 'memories'} planted 
+            <span className="mx-2 opacity-50">•</span>
+            <span>{stats.remaining} days to grow</span>
+          </div>
+
+          {/* Right: Primary CTA */}
+          <Button 
+            size="sm" 
+            onClick={() => setActiveTab("today")}
+            className="bg-primary text-background hover:bg-primary/90 font-mono text-xs shadow-sm"
+          >
+            <PenLine className="w-3 h-3 mr-2" />
+            Plant Today
+          </Button>
+        </div>
+      </header>
+
+      {/* 2. MAIN CONTENT AREA 
+         Centered container with max-width to prevent "floating" feel.
+      */}
+      <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-8 pb-32">
         {activeTab === "garden" && (
-          <YearGrid
-            key={refreshKey}
-            year={currentYear}
-            onDayClick={handleDayClick}
-          />
+          <div className="animate-in fade-in duration-500">
+             <div className="mb-6">
+                <h2 className="text-2xl font-bold text-foreground mb-1">Your Garden</h2>
+                <p className="text-sm text-muted-foreground max-w-md">
+                  Each dot represents a day. Click any plant to revisit that memory.
+                </p>
+             </div>
+             <YearGrid
+               key={refreshKey}
+               year={currentYear}
+               onDayClick={handleDayClick}
+             />
+          </div>
         )}
 
         {activeTab === "today" && (
-          <TodayView onSave={handleSave} />
+          <div className="max-w-xl mx-auto animate-in slide-in-from-bottom-4 duration-500">
+            <TodayView onSave={handleSave} />
+          </div>
         )}
 
         {activeTab === "gallery" && (
-          <IconGallery />
+           <div className="animate-in fade-in duration-500">
+             <IconGallery />
+           </div>
         )}
       </main>
 
-      {/* Navigation */}
-      <Navigation activeTab={activeTab} onTabChange={handleTabChange} />
+      {/* 3. NAVIGATION
+         Kept at bottom, but will be updated in next file to include labels
+      */}
+      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {/* Journal modal for past days */}
       <JournalModal
         day={selectedDay}
         isOpen={isModalOpen}

@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { PlantTile } from "./PlantTile";
-import { getDaysInYear, DayInfo, getJournalStats } from "@/lib/journalData";
+import { getDaysInYear, DayInfo } from "@/lib/journalData";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface YearGridProps {
   year: number;
@@ -9,33 +10,36 @@ interface YearGridProps {
 
 export const YearGrid: React.FC<YearGridProps> = ({ year, onDayClick }) => {
   const days = useMemo(() => getDaysInYear(year), [year]);
-  const stats = useMemo(() => getJournalStats(year), [year]);
 
   return (
-    <div className="page-transition space-y-6">
-      {/* Year pill */}
-      <div className="flex justify-start">
-        <div className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-full font-mono text-sm">
-          {year}
-        </div>
-      </div>
-
-      {/* Dense grid like the reference - all 365 days in one view */}
-      <div className="grid grid-cols-14 sm:grid-cols-18 md:grid-cols-22 lg:grid-cols-26 gap-0.5">
-        {days.map((day, index) => (
-          <PlantTile
-            key={day.dayOfYear}
-            day={day}
-            onClick={onDayClick}
-            delay={0}
-          />
-        ))}
-      </div>
-
-      {/* Stats footer */}
-      <div className="flex justify-between items-center text-xs text-muted-foreground font-mono pt-4 border-t border-border">
-        <span>{year}</span>
-        <span>{stats.remaining} days to grow</span>
+    <div className="w-full">
+      {/* Grid Logic:
+         - Mobile: 7 cols (weeks)
+         - Tablet: 14 cols (2 weeks)
+         - Desktop: 21 cols (3 weeks) 
+         This creates a nice dense block of texture.
+      */}
+      <div className="grid grid-cols-7 sm:grid-cols-14 md:grid-cols-21 gap-x-2 gap-y-3 sm:gap-x-3 sm:gap-y-4 justify-items-center">
+        <TooltipProvider delayDuration={100}>
+          {days.map((day) => (
+            <Tooltip key={day.dayOfYear}>
+              <TooltipTrigger asChild>
+                <div className="relative">
+                   <PlantTile
+                     day={day}
+                     onClick={onDayClick}
+                   />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent 
+                side="top" 
+                className="bg-primary text-background font-mono text-xs px-2 py-1"
+              >
+                <p>{day.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p>
+              </TooltipContent>
+            </Tooltip>
+          ))}
+        </TooltipProvider>
       </div>
     </div>
   );
