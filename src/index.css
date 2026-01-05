@@ -4,106 +4,67 @@
 
 @layer base {
   :root {
-    /* Light gray paper background like the reference */
-    --background: 220 10% 94%;
-    --foreground: 230 60% 40%;
+    /* "Blueprint" Light Mode */
+    --background: 240 5% 98%; 
+    --foreground: 240 10% 3.9%;
 
-    /* Cards slightly lighter */
-    --card: 220 10% 96%;
-    --card-foreground: 230 60% 40%;
+    /* High Contrast Primary (Deep Blue or Black) */
+    --primary: 240 95% 35%; 
+    --primary-foreground: 0 0% 98%;
 
-    --popover: 220 10% 96%;
-    --popover-foreground: 230 60% 40%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
 
-    /* Royal blue ink accent - matching reference */
-    --primary: 230 70% 50%;
-    --primary-foreground: 0 0% 100%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 95% 35%;
+    
+    --radius: 0.75rem;
 
-    /* Soft muted gray */
-    --secondary: 220 8% 92%;
-    --secondary-foreground: 230 50% 35%;
-
-    --muted: 220 8% 88%;
-    --muted-foreground: 230 30% 55%;
-
-    /* Light blue tint for accents */
-    --accent: 230 50% 94%;
-    --accent-foreground: 230 70% 45%;
-
-    --destructive: 0 70% 55%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 220 10% 85%;
-    --input: 220 10% 85%;
-    --ring: 230 70% 50%;
-
-    --radius: 1rem;
-
-    /* Custom garden tokens */
-    --garden-cream: 220 10% 94%;
-    --garden-paper: 220 10% 92%;
-    --garden-ink: 230 70% 50%;
-    --garden-ink-light: 230 50% 90%;
-    --garden-ink-muted: 230 30% 70%;
-    --garden-shadow: 230 20% 80%;
-    --garden-dotted: 220 10% 78%;
-
-    /* Sidebar */
-    --sidebar-background: 220 10% 94%;
-    --sidebar-foreground: 230 50% 35%;
-    --sidebar-primary: 230 70% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 230 50% 94%;
-    --sidebar-accent-foreground: 230 70% 45%;
-    --sidebar-border: 220 10% 85%;
-    --sidebar-ring: 230 70% 50%;
+    /* Removed Rainbow Moods - Enforcing Monochrome */
+    --garden-ink: 240 95% 35%;
   }
 
   .dark {
-    --background: 220 20% 10%;
-    --foreground: 40 20% 95%;
+    /* "Chalkboard" Dark Mode */
+    --background: 240 10% 10%;
+    --foreground: 0 0% 98%;
 
-    --card: 220 18% 13%;
-    --card-foreground: 40 20% 95%;
+    --primary: 0 0% 98%; /* White ink in dark mode */
+    --primary-foreground: 240 5.9% 10%;
 
-    --popover: 220 18% 13%;
-    --popover-foreground: 40 20% 95%;
+    --card: 240 10% 12%;
+    --card-foreground: 0 0% 98%;
+    
+    --popover: 240 10% 12%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 228 70% 65%;
-    --primary-foreground: 220 20% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
 
-    --secondary: 220 15% 18%;
-    --secondary-foreground: 40 20% 90%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
 
-    --muted: 220 15% 20%;
-    --muted-foreground: 40 15% 60%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
 
-    --accent: 228 40% 20%;
-    --accent-foreground: 228 70% 75%;
-
-    --destructive: 0 60% 45%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 220 15% 22%;
-    --input: 220 15% 22%;
-    --ring: 228 70% 65%;
-
-    --garden-cream: 220 20% 10%;
-    --garden-paper: 220 18% 14%;
-    --garden-ink: 228 70% 65%;
-    --garden-ink-light: 228 40% 20%;
-    --garden-ink-muted: 228 30% 45%;
-    --garden-shadow: 220 20% 8%;
-    --garden-dotted: 220 15% 30%;
-
-    --sidebar-background: 220 18% 12%;
-    --sidebar-foreground: 40 20% 90%;
-    --sidebar-primary: 228 70% 65%;
-    --sidebar-primary-foreground: 220 20% 10%;
-    --sidebar-accent: 228 40% 20%;
-    --sidebar-accent-foreground: 228 70% 75%;
-    --sidebar-border: 220 15% 22%;
-    --sidebar-ring: 228 70% 65%;
+    --border: 240 3.7% 20%; /* Visible borders in dark mode */
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
   }
 }
 
@@ -111,100 +72,49 @@
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground font-mono antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
-  }
-
-  h1, h2, h3, h4 {
-    @apply font-mono;
   }
 }
 
 @layer utilities {
-  .font-mono {
-    font-family: 'Space Mono', 'JetBrains Mono', monospace;
+  /* Fix for "Vanished" Icons: Ensure explicit stroke/fill behavior */
+  
+  .plant-filled {
+    /* Solid color for filled icons */
+    fill: currentColor;
+    stroke: none;
+  }
+  
+  .plant-outlined {
+    /* Outline for empty icons */
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
-  .font-display {
-    font-family: 'Space Mono', monospace;
-    font-weight: 400;
-  }
-
-  .garden-shadow {
-    box-shadow: 0 4px 20px -4px hsl(var(--garden-shadow) / 0.5);
-  }
-
-  .garden-shadow-sm {
-    box-shadow: 0 2px 10px -2px hsl(var(--garden-shadow) / 0.4);
-  }
-
-  .plant-tile {
-    @apply transition-all duration-300 ease-out;
-  }
-
-  .plant-tile:hover {
-    transform: translateY(-2px) scale(1.05);
-  }
-
+  /* Legacy support for gallery icons */
   .ink-stroke {
-    stroke: hsl(var(--garden-ink));
-    stroke-width: 2;
+    stroke: currentColor;
+    stroke-width: 1.5;
     stroke-linecap: round;
     stroke-linejoin: round;
     fill: none;
   }
 
   .ink-fill {
-    fill: hsl(var(--garden-ink));
+    fill: currentColor;
+    stroke: currentColor;
   }
 
-  .dotted-placeholder {
-    border: 2px dashed hsl(var(--garden-dotted));
-  }
-
-  /* Smooth page transitions */
   .page-transition {
     animation: fadeIn 0.4s ease-out;
   }
 
   @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-4px);
-    }
-  }
-
-  .float-animation {
-    animation: float 3s ease-in-out infinite;
-  }
-
-  @keyframes grow {
-    0% {
-      transform: scale(0.8);
-      opacity: 0;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-
-  .grow-animation {
-    animation: grow 0.5s ease-out forwards;
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }

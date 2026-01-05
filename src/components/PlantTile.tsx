@@ -6,34 +6,43 @@ import { getPlantIconForDay } from "./PlantIcons";
 interface PlantTileProps {
   day: DayInfo;
   onClick: (day: DayInfo) => void;
-  delay?: number;
 }
 
-export const PlantTile: React.FC<PlantTileProps> = ({ day, onClick, delay = 0 }) => {
+export const PlantTile: React.FC<PlantTileProps> = ({ day, onClick }) => {
   const PlantIcon = getPlantIconForDay(day.dayOfYear);
   const isClickable = !day.isFuture;
-
+  
   return (
-    <button
+    <div
       onClick={() => isClickable && onClick(day)}
-      disabled={day.isFuture}
       className={cn(
-        "w-full aspect-square flex items-center justify-center transition-all duration-200",
-        "rounded-sm p-0.5",
-        isClickable && "hover:bg-garden-ink-light hover:scale-110 cursor-pointer",
-        day.isFuture && "opacity-30 cursor-default",
-        day.isToday && "ring-1 ring-primary ring-offset-1 ring-offset-background rounded-md"
+        "relative flex items-center justify-center transition-all duration-300",
+        "w-8 h-8", 
+        isClickable && "cursor-pointer hover:scale-110 group",
+        day.isFuture && "cursor-default opacity-40"
       )}
-      title={day.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
     >
       {day.hasEntry ? (
+        /* FILLED: Always Primary Color (Black/Blue) - No Mood Colors */
         <PlantIcon 
-          className="w-full h-full" 
+          className="w-6 h-6 drop-shadow-sm plant-filled text-primary transition-colors"
           filled={true} 
         />
+      ) : day.isPast || day.isToday ? (
+        /* EMPTY: Muted Outline */
+        <PlantIcon 
+          className="w-5 h-5 text-muted-foreground/40 plant-outlined group-hover:text-primary/70 transition-colors"
+          filled={false} 
+        />
       ) : (
-        <div className="w-1 h-1 rounded-full bg-garden-dotted" />
+        /* FUTURE: Dot */
+        <div className="w-1.5 h-1.5 rounded-full border border-muted-foreground/30 bg-transparent" />
       )}
-    </button>
+
+      {/* TODAY: Simple Ring */
+      day.isToday && (
+        <span className="absolute inset-0 rounded-full border border-primary/40 animate-pulse" />
+      )}
+    </div>
   );
 };

@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Navigation, NavTab } from "@/components/Navigation";
 import { YearGrid } from "@/components/YearGrid";
 import { TodayView } from "@/components/TodayView";
 import { IconGallery } from "@/components/IconGallery";
 import { JournalModal } from "@/components/JournalModal";
-import { DayInfo, initializeJournal, isToday, getDaysInYear } from "@/lib/journalData";
+import { DayInfo, initializeJournal, getJournalStats } from "@/lib/journalData";
 
 const Index: React.FC = () => {
   const [activeTab, setActiveTab] = useState<NavTab>("garden");
@@ -14,7 +14,6 @@ const Index: React.FC = () => {
 
   const currentYear = new Date().getFullYear();
 
-  // Initialize journal with sample data
   useEffect(() => {
     initializeJournal();
   }, []);
@@ -34,45 +33,64 @@ const Index: React.FC = () => {
   }, []);
 
   const handleSave = useCallback(() => {
-    // Force refresh of the grid
     setRefreshKey((prev) => prev + 1);
   }, []);
 
-  const handleTabChange = useCallback((tab: NavTab) => {
-    setActiveTab(tab);
-  }, []);
-
-  // Get fresh day data when refreshKey changes
-  const getTodayDayInfo = useCallback((): DayInfo | null => {
-    const days = getDaysInYear(currentYear);
-    return days.find((d) => isToday(d.date)) || null;
-  }, [currentYear, refreshKey]);
+  const stats = useMemo(() => getJournalStats(currentYear), [currentYear, refreshKey]);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Main content */}
-      <main className="container max-w-4xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background text-foreground font-mono flex flex-col">
+      {/* HEADER */}
+      <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-md border-b border-border/30">
+        <div className="container max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-bold tracking-tight text-primary">{currentYear}</h1>
+            <span className="text-muted-foreground/40">/</span>
+            <span className="text-sm font-medium text-muted-foreground tracking-wide">daily bloom</span>
+          </div>
+
+          <div className="text-xs font-mono text-muted-foreground hidden sm:block bg-secondary/50 px-3 py-1 rounded-full">
+            <span className="text-foreground font-bold">{stats.written}</span> memories 
+            <span className="mx-2 text-muted-foreground/30">•</span>
+            {stats.remaining} days left
+          </div>
+          
+          {/* Spacer for balance */}
+          <div className="w-[10px] sm:w-[100px]" />
+        </div>
+      </header>
+
+      {/* MAIN */}
+      <main className="flex-1 w-full max-w-6xl mx-auto px-6 py-10 pb-32">
         {activeTab === "garden" && (
-          <YearGrid
-            key={refreshKey}
-            year={currentYear}
-            onDayClick={handleDayClick}
-          />
+          <div>
+             <div className="mb-10 max-w-lg">
+                <h2 className="text-3xl font-bold text-foreground mb-3 tracking-tight">Your Garden</h2>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Each dot is a day. Click to plant a memory, or watch your garden grow in color over time.
+                </p>
+             </div>
+             <YearGrid
+               key={refreshKey}
+               year={currentYear}
+               onDayClick={handleDayClick}
+             />
+          </div>
         )}
 
         {activeTab === "today" && (
-          <TodayView onSave={handleSave} />
+          <div className="max-w-xl mx-auto animate-in slide-in-from-bottom-4 duration-500">
+            <TodayView onSave={handleSave} />
+          </div>
         )}
 
         {activeTab === "gallery" && (
-          <IconGallery />
+           <IconGallery />
         )}
       </main>
 
-      {/* Navigation */}
-      <Navigation activeTab={activeTab} onTabChange={handleTabChange} />
+      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {/* Journal modal for past days */}
       <JournalModal
         day={selectedDay}
         isOpen={isModalOpen}

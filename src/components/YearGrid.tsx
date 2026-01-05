@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { PlantTile } from "./PlantTile";
-import { getDaysInYear, DayInfo, getJournalStats } from "@/lib/journalData";
+import { getMonthsInYear, DayInfo } from "@/lib/journalData";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface YearGridProps {
   year: number;
@@ -8,34 +9,46 @@ interface YearGridProps {
 }
 
 export const YearGrid: React.FC<YearGridProps> = ({ year, onDayClick }) => {
-  const days = useMemo(() => getDaysInYear(year), [year]);
-  const stats = useMemo(() => getJournalStats(year), [year]);
+  const months = useMemo(() => getMonthsInYear(year), [year]);
 
   return (
-    <div className="page-transition space-y-6">
-      {/* Year pill */}
-      <div className="flex justify-start">
-        <div className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-full font-mono text-sm">
-          {year}
-        </div>
-      </div>
+    <div className="w-full space-y-8 animate-in fade-in duration-500">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-10">
+        <TooltipProvider delayDuration={0}>
+          {months.map((month) => (
+            <div key={month.name} className="flex flex-col space-y-3">
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">
+                {month.name}
+              </h3>
 
-      {/* Dense grid like the reference - all 365 days in one view */}
-      <div className="grid grid-cols-14 sm:grid-cols-18 md:grid-cols-22 lg:grid-cols-26 gap-0.5">
-        {days.map((day, index) => (
-          <PlantTile
-            key={day.dayOfYear}
-            day={day}
-            onClick={onDayClick}
-            delay={0}
-          />
-        ))}
-      </div>
+              <div className="grid grid-cols-7 gap-1 mb-1 px-1">
+                {['S','M','T','W','T','F','S'].map((d, i) => (
+                  <span key={i} className="text-[10px] text-center text-muted-foreground/30 font-mono select-none">{d}</span>
+                ))}
+              </div>
 
-      {/* Stats footer */}
-      <div className="flex justify-between items-center text-xs text-muted-foreground font-mono pt-4 border-t border-border">
-        <span>{year}</span>
-        <span>{stats.remaining} days to grow</span>
+              <div className="grid grid-cols-7 gap-1 p-3 bg-secondary/20 rounded-2xl border border-border/40">
+                {Array.from({ length: month.days[0].date.getDay() }).map((_, i) => (
+                  <div key={`empty-${i}`} className="w-8 h-8" />
+                ))}
+
+                {month.days.map((day) => (
+                  <Tooltip key={day.dayOfYear}>
+                    <TooltipTrigger asChild>
+                      <div>
+                        <PlantTile day={day} onClick={onDayClick} />
+                      </div>
+                    </TooltipTrigger>
+                    {/* UPDATED: Uses en-GB to force DD/MM format */}
+                    <TooltipContent className="bg-primary text-primary-foreground text-xs font-mono border border-border">
+                      {day.date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })}
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </div>
+            </div>
+          ))}
+        </TooltipProvider>
       </div>
     </div>
   );
