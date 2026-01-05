@@ -1,6 +1,5 @@
 import React from "react";
 import { 
-  allPlantIcons, 
   PlantIcon1, PlantIcon2, PlantIcon3, PlantIcon4, PlantIcon5,
   PlantIcon6, PlantIcon7, PlantIcon8, PlantIcon9, PlantIcon10,
   PlantIcon11, PlantIcon12, PlantIcon13, PlantIcon14, PlantIcon15,
@@ -10,7 +9,6 @@ import {
   AppleIcon, CherryIcon, CarrotIcon, PumpkinIcon, AcornIcon
 } from "./PlantIcons";
 
-// Organizing icons into logical groups for the "Collection" view
 const categories = [
   {
     title: "Flowers & Flora",
@@ -36,32 +34,32 @@ const categories = [
 
 export const IconGallery: React.FC = () => {
   return (
-    <div className="space-y-12">
-      <div className="space-y-2">
-        <h2 className="text-2xl font-bold text-foreground">Plant Collection</h2>
-        <p className="text-muted-foreground font-mono text-sm">
-          All 365 unique hand-drawn stamps available for your daily entries.
+    <div className="space-y-12 animate-in slide-in-from-bottom-4 duration-500">
+      <div className="space-y-2 mb-8">
+        <h2 className="text-3xl font-bold text-foreground tracking-tight">Collection</h2>
+        <p className="text-muted-foreground font-mono text-sm max-w-lg">
+          The complete library of 365 hand-drawn stamps.
         </p>
       </div>
 
-      <div className="space-y-10">
+      <div className="grid gap-12">
         {categories.map((category, idx) => (
-          <div key={idx} className="space-y-4">
-            <div className="border-b border-border/50 pb-2">
+          <div key={idx} className="space-y-5">
+            <div className="border-b border-border/60 pb-3">
               <h3 className="font-mono text-sm font-bold text-primary uppercase tracking-wider">
                 {category.title}
               </h3>
-              <p className="text-xs text-muted-foreground">{category.description}</p>
+              <p className="text-xs text-muted-foreground mt-1">{category.description}</p>
             </div>
             
-            <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-3">
+            <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-4">
               {category.icons.map((Icon, iconIdx) => (
                 <div 
                   key={iconIdx}
-                  className="group aspect-square flex items-center justify-center p-2 rounded-xl hover:bg-white hover:shadow-sm hover:border hover:border-border transition-all duration-200 cursor-help"
-                  title="Plant Stamp"
+                  className="group aspect-square flex items-center justify-center p-2 rounded-xl bg-secondary/30 border border-transparent hover:bg-background hover:shadow-md hover:border-border transition-all duration-200"
                 >
-                  <Icon className="w-full h-full text-foreground group-hover:text-primary transition-colors" filled={false} />
+                  {/* Explicit text color ensures visibility */}
+                  <Icon className="w-full h-full text-foreground/80 group-hover:text-primary transition-colors ink-stroke" filled={false} />
                 </div>
               ))}
             </div>

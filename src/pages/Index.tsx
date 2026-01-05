@@ -4,9 +4,7 @@ import { YearGrid } from "@/components/YearGrid";
 import { TodayView } from "@/components/TodayView";
 import { IconGallery } from "@/components/IconGallery";
 import { JournalModal } from "@/components/JournalModal";
-import { DayInfo, initializeJournal, isToday, getDaysInYear, getJournalStats } from "@/lib/journalData";
-import { Button } from "@/components/ui/button";
-import { PenLine, Sprout } from "lucide-react";
+import { DayInfo, initializeJournal, getJournalStats } from "@/lib/journalData";
 
 const Index: React.FC = () => {
   const [activeTab, setActiveTab] = useState<NavTab>("garden");
@@ -38,55 +36,38 @@ const Index: React.FC = () => {
     setRefreshKey((prev) => prev + 1);
   }, []);
 
-  // Calculate stats for the header
   const stats = useMemo(() => getJournalStats(currentYear), [currentYear, refreshKey]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-mono selection:bg-primary/20 flex flex-col">
-      {/* 1. NEW HEADER 
-         Replaces the floating stats pill. Anchors the top of the screen.
-      */}
-      <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-md border-b border-border/40">
-        <div className="container max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-          
-          {/* Left: Branding */}
+    <div className="min-h-screen bg-background text-foreground font-mono flex flex-col">
+      {/* HEADER */}
+      <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-md border-b border-border/30">
+        <div className="container max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-bold tracking-tight text-primary">{currentYear}</h1>
-            <span className="hidden sm:inline-block text-muted-foreground text-sm">|</span>
-            <span className="hidden sm:inline-block text-sm font-medium text-foreground/80">
-              daily bloom
-            </span>
+            <span className="text-muted-foreground/40">/</span>
+            <span className="text-sm font-medium text-muted-foreground tracking-wide">daily bloom</span>
           </div>
 
-          {/* Center: Stats (Hidden on tiny screens, shown on mobile/desktop) */}
-          <div className="text-xs font-mono text-muted-foreground hidden xs:block">
-            <span className="text-primary font-bold">{stats.written}</span> {stats.written === 1 ? 'memory' : 'memories'} planted 
-            <span className="mx-2 opacity-50">•</span>
-            <span>{stats.remaining} days to grow</span>
+          <div className="text-xs font-mono text-muted-foreground hidden sm:block bg-secondary/50 px-3 py-1 rounded-full">
+            <span className="text-foreground font-bold">{stats.written}</span> memories 
+            <span className="mx-2 text-muted-foreground/30">•</span>
+            {stats.remaining} days left
           </div>
-
-          {/* Right: Primary CTA */}
-          <Button 
-            size="sm" 
-            onClick={() => setActiveTab("today")}
-            className="bg-primary text-background hover:bg-primary/90 font-mono text-xs shadow-sm"
-          >
-            <PenLine className="w-3 h-3 mr-2" />
-            Plant Today
-          </Button>
+          
+          {/* Spacer for balance */}
+          <div className="w-[10px] sm:w-[100px]" />
         </div>
       </header>
 
-      {/* 2. MAIN CONTENT AREA 
-         Centered container with max-width to prevent "floating" feel.
-      */}
-      <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-8 pb-32">
+      {/* MAIN */}
+      <main className="flex-1 w-full max-w-6xl mx-auto px-6 py-10 pb-32">
         {activeTab === "garden" && (
-          <div className="animate-in fade-in duration-500">
-             <div className="mb-6">
-                <h2 className="text-2xl font-bold text-foreground mb-1">Your Garden</h2>
-                <p className="text-sm text-muted-foreground max-w-md">
-                  Each dot represents a day. Click any plant to revisit that memory.
+          <div>
+             <div className="mb-10 max-w-lg">
+                <h2 className="text-3xl font-bold text-foreground mb-3 tracking-tight">Your Garden</h2>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Each dot is a day. Click to plant a memory, or watch your garden grow in color over time.
                 </p>
              </div>
              <YearGrid
@@ -104,15 +85,10 @@ const Index: React.FC = () => {
         )}
 
         {activeTab === "gallery" && (
-           <div className="animate-in fade-in duration-500">
-             <IconGallery />
-           </div>
+           <IconGallery />
         )}
       </main>
 
-      {/* 3. NAVIGATION
-         Kept at bottom, but will be updated in next file to include labels
-      */}
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
 
       <JournalModal

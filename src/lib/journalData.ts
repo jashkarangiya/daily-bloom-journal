@@ -1,7 +1,10 @@
 // Types
+export type MoodType = 'great' | 'good' | 'okay' | 'bad' | null;
+
 export interface JournalEntry {
   date: string; // YYYY-MM-DD
   content: string;
+  mood: MoodType; // Added mood
   photos?: string[]; // Array of photo URLs/base64
   createdAt: Date;
   updatedAt: Date;
@@ -59,7 +62,39 @@ export const isFutureDate = (date: Date): boolean => {
   return compareDate > today;
 };
 
-// Get all days in a year
+// NEW: Helper to get days grouped by month for the new layout
+export const getMonthsInYear = (year: number): { name: string; days: DayInfo[] }[] => {
+  const months = [];
+  
+  for (let m = 0; m < 12; m++) {
+    const date = new Date(year, m, 1);
+    const monthName = date.toLocaleDateString('en-US', { month: 'long' });
+    const daysInMonth: DayInfo[] = [];
+    
+    // Iterate through days of this month
+    while (date.getMonth() === m) {
+      const dateStr = formatDate(date);
+      const entries = getEntriesFromStorage();
+      const entry = entries[dateStr];
+      
+      daysInMonth.push({
+        date: new Date(date),
+        dayOfYear: getDayOfYear(date),
+        isToday: isToday(date),
+        isPast: isPastDate(date),
+        isFuture: isFutureDate(date),
+        hasEntry: !!entry,
+        hasPhotos: !!(entry?.photos && entry.photos.length > 0),
+        entry,
+      });
+      date.setDate(date.getDate() + 1);
+    }
+    months.push({ name: monthName, days: daysInMonth });
+  }
+  return months;
+};
+
+// Keep the old linear getter just in case
 export const getDaysInYear = (year: number): DayInfo[] => {
   const days: DayInfo[] = [];
   const startDate = new Date(year, 0, 1);
@@ -85,7 +120,6 @@ export const getDaysInYear = (year: number): DayInfo[] => {
     
     currentDate.setDate(currentDate.getDate() + 1);
   }
-  
   return days;
 };
 
@@ -100,7 +134,6 @@ export const getEntriesFromStorage = (): Record<string, JournalEntry> => {
   
   try {
     const parsed = JSON.parse(stored);
-    // Convert date strings back to Date objects
     Object.keys(parsed).forEach(key => {
       parsed[key].createdAt = new Date(parsed[key].createdAt);
       parsed[key].updatedAt = new Date(parsed[key].updatedAt);
@@ -132,45 +165,48 @@ export const getJournalStats = (year: number): { written: number; remaining: num
   const dayOfYear = getDayOfYear(today);
   const isCurrentYear = today.getFullYear() === year;
   
-  const daysPassedThisYear = isCurrentYear ? dayOfYear : 365;
+  // If it's the current year, remaining is days passed - written. 
+  // If distinct "remaining in year", it would be 365 - written.
+  // We'll stick to "days remaining in the year to fill" logic.
   
   return {
     written: yearEntries.length,
-    remaining: Math.max(0, daysPassedThisYear - yearEntries.length),
+    remaining: 365 - yearEntries.length,
   };
 };
 
-// Sample entries for demo
+// Updated Sample Generator with Moods
 export const addSampleEntries = (): void => {
   const currentYear = new Date().getFullYear();
   const today = new Date();
+  const moods: MoodType[] = ['great', 'good', 'okay', 'bad'];
   
   const sampleTexts = [
-    "Started the day with a beautiful sunrise walk. The morning dew on the grass reminded me of simpler times.",
-    "Had the most delicious homemade soup for lunch. Grandma's recipe never fails.",
-    "Finished reading that book I've been putting off. The ending was unexpected but perfect.",
-    "Spent the afternoon in the garden, planting new seeds. Can't wait to see them grow.",
-    "Called an old friend today. It's amazing how time flies, but some connections remain strong.",
-    "Tried a new recipe for dinner. It was a disaster, but we laughed about it.",
-    "Watched the stars tonight. The sky was so clear, I could see the Milky Way.",
-    "Felt grateful for the little things today - a warm cup of tea, a good book, a cozy blanket.",
+    "Sunrise walk was perfect today.",
+    "Struggled with focus, but made it through.",
+    "Dinner with friends, laughed so much.",
+    "Quiet day reading by the window.",
+    "Finally finished that big project!",
   ];
   
   const entries = getEntriesFromStorage();
   
   // Add entries for some random past days
-  for (let i = 1; i <= 30; i++) {
+  for (let i = 1; i <= 40; i++) {
     const date = new Date(today);
-    date.setDate(date.getDate() - Math.floor(Math.random() * 60)); // Random day in last 60 days
+    date.setDate(date.getDate() - Math.floor(Math.random() * 90)); // Past 3 months
     
     if (date.getFullYear() !== currentYear) continue;
     
     const dateStr = formatDate(date);
     
-    if (!entries[dateStr] && Math.random() > 0.4) { // 60% chance to add entry
+    if (!entries[dateStr] && Math.random() > 0.4) { 
+      const mood = moods[Math.floor(Math.random() * moods.length)];
+      
       const entry: JournalEntry = {
         date: dateStr,
         content: sampleTexts[Math.floor(Math.random() * sampleTexts.length)],
+        mood: mood,
         createdAt: date,
         updatedAt: date,
       };
@@ -181,7 +217,6 @@ export const addSampleEntries = (): void => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
 };
 
-// Initialize with sample data if empty
 export const initializeJournal = (): void => {
   const entries = getEntriesFromStorage();
   if (Object.keys(entries).length === 0) {
