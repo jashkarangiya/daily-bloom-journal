@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Caveat", "cursive"],
-        sans: ["DM Sans", "sans-serif"],
+        mono: ["Space Mono", "JetBrains Mono", "monospace"],
+        display: ["Space Mono", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",

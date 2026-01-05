@@ -2,6 +2,7 @@
 export interface JournalEntry {
   date: string; // YYYY-MM-DD
   content: string;
+  photos?: string[]; // Array of photo URLs/base64
   createdAt: Date;
   updatedAt: Date;
 }
@@ -13,6 +14,7 @@ export interface DayInfo {
   isPast: boolean;
   isFuture: boolean;
   hasEntry: boolean;
+  hasPhotos: boolean;
   entry?: JournalEntry;
 }
 
@@ -77,6 +79,7 @@ export const getDaysInYear = (year: number): DayInfo[] => {
       isPast: isPastDate(currentDate),
       isFuture: isFutureDate(currentDate),
       hasEntry: !!entry,
+      hasPhotos: !!(entry?.photos && entry.photos.length > 0),
       entry,
     });
     
