@@ -1,6 +1,7 @@
+
 # 🌸 Daily Bloom Journal
 
-A modern, fast, and responsive journaling application built to help users track their daily thoughts and growth. This project was bootstrapped using [Lovable](https://lovable.dev), leveraging the power of AI to generate a clean, component-driven UI.
+A modern, fast, and responsive journaling application built to help users track their daily thoughts and growth. The interface features a "memory garden" aesthetic where every entry plants a seed, allowing users to visualize their year as a growing garden.
 
 ![Project Status](https://img.shields.io/badge/status-active-success)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -15,69 +16,92 @@ This project is built with a modern frontend stack focusing on performance and d
 - **[Tailwind CSS](https://tailwindcss.com/):** Utility-first CSS framework.
 - **[shadcn-ui](https://ui.shadcn.com/):** Beautifully designed components built with Radix UI and Tailwind.
 
-## 🛠️ How to Edit & Contribute
+## 🛠️ Getting Started
 
-You have two workflows for editing this application:
+Follow these steps to get the project running on your local machine.
 
-### Option 1: Using Lovable (AI-Assisted)
-
-Visit the [Lovable Project Dashboard](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) to prompt changes using AI. Any changes made via the Lovable interface will be automatically committed to this repository.
-
-> 🔧 **Note:** Replace `REPLACE_WITH_PROJECT_ID` with your actual Lovable project ID.
-
-### Option 2: Local Development (Manual)
-
-If you prefer using your own IDE (like VS Code), follow these steps:
-
-**Prerequisites**
+### Prerequisites
 
 Ensure you have Node.js & npm installed. (Recommended: Use [nvm](https://github.com/nvm-sh/nvm)).
 
-**Installation**
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/jashkarangiya/daily-bloom-journal.git
+    ```
+2. **Navigate to the project directory**
+   
+    ```bash
+   cd daily-bloom-journal
+   ```
+
+3. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+4. **Start the development server**
+
+   ```bash
+   npm run dev
+   ```
+
+The application will be available at `http://localhost:8080`.
+
+### Building for Production
+
+To create a production-ready build:
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/jashkarangiya/daily-bloom-journal.git
-
-# 2. Navigate to the project directory
-cd daily-bloom-journal
-
-# 3. Install dependencies
-npm install
-
-# 4. Start the development server
-npm run dev
+npm run build
 ```
-## Alternative Editing Methods
 
-- **GitHub Codespaces:** Click the green **Code** button → **Codespaces** → **New codespace**.  
-- **GitHub Web Editor:** Press `.` on the repository home page or click the pencil icon on any file.
+This will generate a `dist` folder containing the compiled assets ready for deployment.
 
 ## 📦 Deployment
 
-You can deploy this application instantly using Lovable's built-in hosting:
+You can deploy this application to any static hosting provider (Vercel, Netlify, GitHub Pages, etc.).
 
-1. Open your project in [Lovable](https://lovable.dev).
-2. Click **Share** → **Publish**.
+**Example: Vercel**
 
-## Custom Domain
+1. Install Vercel CLI:
 
-To connect a custom domain:
+   ```bash
+   npm i -g vercel
+   ```
 
-1. Navigate to **Project → Settings → Domains**.
-2. Click **Connect Domain**.
-3. Follow the [official documentation](https://docs.lovable.dev/features/custom-domain).
+2. Run the following in the project root:
+
+   ```bash
+   vercel
+   ```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## 📄 License
 
 This project is open source and available under the [MIT License](LICENSE).
 
----
 
-And here’s the `LICENSE` file content (MIT):
 
-```markdown
+
+### `LICENSE`
+
+```text
 MIT License
+
+Copyright (c) 2026 Jash Karangiya
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the “Software”), to deal
@@ -96,5 +120,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-```
-
+````
