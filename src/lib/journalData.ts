@@ -1,10 +1,11 @@
 // Types
-export type MoodType = 'great' | 'good' | 'okay' | 'bad' | null;
+// EXPANDED MOODS: 6 distinct states
+export type MoodType = 'amazing' | 'good' | 'calm' | 'neutral' | 'tired' | 'rough' | null;
 
 export interface JournalEntry {
   date: string; // YYYY-MM-DD
   content: string;
-  mood: MoodType; // Added mood
+  mood: MoodType;
   photos?: string[]; // Array of photo URLs/base64
   createdAt: Date;
   updatedAt: Date;
@@ -34,7 +35,7 @@ export const formatDate = (date: Date): string => {
 };
 
 export const formatDisplayDate = (date: Date): string => {
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString('en-GB', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
@@ -62,7 +63,7 @@ export const isFutureDate = (date: Date): boolean => {
   return compareDate > today;
 };
 
-// NEW: Helper to get days grouped by month for the new layout
+// Helper to get days grouped by month for the grid view
 export const getMonthsInYear = (year: number): { name: string; days: DayInfo[] }[] => {
   const months = [];
   
@@ -71,7 +72,6 @@ export const getMonthsInYear = (year: number): { name: string; days: DayInfo[] }
     const monthName = date.toLocaleDateString('en-US', { month: 'long' });
     const daysInMonth: DayInfo[] = [];
     
-    // Iterate through days of this month
     while (date.getMonth() === m) {
       const dateStr = formatDate(date);
       const entries = getEntriesFromStorage();
@@ -92,35 +92,6 @@ export const getMonthsInYear = (year: number): { name: string; days: DayInfo[] }
     months.push({ name: monthName, days: daysInMonth });
   }
   return months;
-};
-
-// Keep the old linear getter just in case
-export const getDaysInYear = (year: number): DayInfo[] => {
-  const days: DayInfo[] = [];
-  const startDate = new Date(year, 0, 1);
-  const endDate = new Date(year, 11, 31);
-  
-  const currentDate = new Date(startDate);
-  
-  while (currentDate <= endDate) {
-    const dateStr = formatDate(currentDate);
-    const entries = getEntriesFromStorage();
-    const entry = entries[dateStr];
-    
-    days.push({
-      date: new Date(currentDate),
-      dayOfYear: getDayOfYear(currentDate),
-      isToday: isToday(currentDate),
-      isPast: isPastDate(currentDate),
-      isFuture: isFutureDate(currentDate),
-      hasEntry: !!entry,
-      hasPhotos: !!(entry?.photos && entry.photos.length > 0),
-      entry,
-    });
-    
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-  return days;
 };
 
 // Local storage helpers
@@ -156,70 +127,38 @@ export const deleteEntryFromStorage = (date: string): void => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
 };
 
-// Stats
-export const getJournalStats = (year: number): { written: number; remaining: number } => {
+// Stats with Streaks
+export const getJournalStats = (year: number): { written: number; remaining: number; streak: number } => {
   const entries = getEntriesFromStorage();
   const yearEntries = Object.keys(entries).filter(date => date.startsWith(year.toString()));
   
+  let currentStreak = 0;
   const today = new Date();
-  const dayOfYear = getDayOfYear(today);
-  const isCurrentYear = today.getFullYear() === year;
   
-  // If it's the current year, remaining is days passed - written. 
-  // If distinct "remaining in year", it would be 365 - written.
-  // We'll stick to "days remaining in the year to fill" logic.
+  let checkDate = new Date(today);
+  let dateStr = formatDate(checkDate);
   
+  if (!entries[dateStr]) {
+    checkDate.setDate(checkDate.getDate() - 1);
+    dateStr = formatDate(checkDate);
+  }
+
+  while (entries[dateStr]) {
+    currentStreak++;
+    checkDate.setDate(checkDate.getDate() - 1);
+    dateStr = formatDate(checkDate);
+  }
+
+  const isLeap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+  const totalDays = isLeap ? 366 : 365;
+
   return {
     written: yearEntries.length,
-    remaining: 365 - yearEntries.length,
+    remaining: totalDays - yearEntries.length,
+    streak: currentStreak
   };
 };
 
-// Updated Sample Generator with Moods
-export const addSampleEntries = (): void => {
-  const currentYear = new Date().getFullYear();
-  const today = new Date();
-  const moods: MoodType[] = ['great', 'good', 'okay', 'bad'];
-  
-  const sampleTexts = [
-    "Sunrise walk was perfect today.",
-    "Struggled with focus, but made it through.",
-    "Dinner with friends, laughed so much.",
-    "Quiet day reading by the window.",
-    "Finally finished that big project!",
-  ];
-  
-  const entries = getEntriesFromStorage();
-  
-  // Add entries for some random past days
-  for (let i = 1; i <= 40; i++) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - Math.floor(Math.random() * 90)); // Past 3 months
-    
-    if (date.getFullYear() !== currentYear) continue;
-    
-    const dateStr = formatDate(date);
-    
-    if (!entries[dateStr] && Math.random() > 0.4) { 
-      const mood = moods[Math.floor(Math.random() * moods.length)];
-      
-      const entry: JournalEntry = {
-        date: dateStr,
-        content: sampleTexts[Math.floor(Math.random() * sampleTexts.length)],
-        mood: mood,
-        createdAt: date,
-        updatedAt: date,
-      };
-      entries[dateStr] = entry;
-    }
-  }
-  
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-};
-
 export const initializeJournal = (): void => {
-  const entries = getEntriesFromStorage();
-  if (Object.keys(entries).length === 0) {
-    addSampleEntries();
-  }
+  // Start fresh
 };

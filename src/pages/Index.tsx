@@ -2,29 +2,29 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Navigation, NavTab } from "@/components/Navigation";
 import { YearGrid } from "@/components/YearGrid";
 import { TodayView } from "@/components/TodayView";
-import { IconGallery } from "@/components/IconGallery";
 import { JournalModal } from "@/components/JournalModal";
+import { SettingsModal } from "@/components/SettingsModal";
+import { StatsView } from "@/components/StatsView"; // Import new Stats
 import { DayInfo, initializeJournal, getJournalStats } from "@/lib/journalData";
+import { Settings2, ChevronLeft, ChevronRight } from "lucide-react";
 
 const Index: React.FC = () => {
   const [activeTab, setActiveTab] = useState<NavTab>("garden");
   const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-
-  const currentYear = new Date().getFullYear();
+  
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     initializeJournal();
   }, []);
 
   const handleDayClick = useCallback((day: DayInfo) => {
-    if (day.isToday) {
-      setActiveTab("today");
-    } else {
-      setSelectedDay(day);
-      setIsModalOpen(true);
-    }
+    if (day.isFuture) return; 
+    setSelectedDay(day);
+    setIsModalOpen(true);
   }, []);
 
   const handleModalClose = useCallback(() => {
@@ -41,40 +41,60 @@ const Index: React.FC = () => {
   return (
     <div className="min-h-screen bg-background text-foreground font-mono flex flex-col">
       {/* HEADER */}
-      <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-md border-b border-border/30">
+      <header className="sticky top-0 z-40 w-full bg-background/90 backdrop-blur-xl border-b border-border/40">
         <div className="container max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold tracking-tight text-primary">{currentYear}</h1>
-            <span className="text-muted-foreground/40">/</span>
-            <span className="text-sm font-medium text-muted-foreground tracking-wide">daily bloom</span>
+          
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1">
+              <button onClick={() => setCurrentYear(y => y - 1)} className="p-1 hover:bg-secondary rounded-full transition-colors text-muted-foreground">
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <h1 className="text-xl font-bold tracking-tight text-primary min-w-[3rem] text-center">{currentYear}</h1>
+              <button onClick={() => setCurrentYear(y => y + 1)} className="p-1 hover:bg-secondary rounded-full transition-colors text-muted-foreground">
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+            <span className="text-muted-foreground/30 h-4 w-[1px] bg-border"></span>
+            <span className="text-sm font-medium text-muted-foreground tracking-wide hidden xs:block">daily bloom</span>
           </div>
 
-          <div className="text-xs font-mono text-muted-foreground hidden sm:block bg-secondary/50 px-3 py-1 rounded-full">
-            <span className="text-foreground font-bold">{stats.written}</span> memories 
-            <span className="mx-2 text-muted-foreground/30">•</span>
-            {stats.remaining} days left
+          <div className="text-xs font-mono text-muted-foreground hidden md:flex items-center gap-4">
+            <span className="bg-secondary/50 px-3 py-1 rounded-full">
+              <span className="text-foreground font-bold">{stats.written}</span> memories
+            </span>
+            {stats.streak > 0 && (
+              <span className="bg-secondary/50 px-3 py-1 rounded-full animate-in fade-in">
+                <span className="text-foreground font-bold">{stats.streak}</span> day streak
+              </span>
+            )}
           </div>
           
-          {/* Spacer for balance */}
-          <div className="w-[10px] sm:w-[100px]" />
+          <button 
+            onClick={() => setIsSettingsOpen(true)}
+            className="p-2 rounded-full hover:bg-secondary/80 transition-colors text-muted-foreground hover:text-primary"
+          >
+            <Settings2 className="w-5 h-5" />
+          </button>
         </div>
       </header>
 
       {/* MAIN */}
       <main className="flex-1 w-full max-w-6xl mx-auto px-6 py-10 pb-32">
         {activeTab === "garden" && (
-          <div>
-             <div className="mb-10 max-w-lg">
-                <h2 className="text-3xl font-bold text-foreground mb-3 tracking-tight">Your Garden</h2>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Each dot is a day. Click to plant a memory, or watch your garden grow in color over time.
-                </p>
-             </div>
-             <YearGrid
-               key={refreshKey}
-               year={currentYear}
-               onDayClick={handleDayClick}
-             />
+          <div className="space-y-16">
+            <YearGrid
+              key={`${currentYear}-${refreshKey}`}
+              year={currentYear}
+              onDayClick={handleDayClick}
+            />
+            
+            {/* Show stats if there is data */}
+            {stats.written > 0 && (
+              <div className="pt-8 border-t border-border/40">
+                <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-6">Yearly Breakdown</h3>
+                <StatsView year={currentYear} />
+              </div>
+            )}
           </div>
         )}
 
@@ -82,10 +102,6 @@ const Index: React.FC = () => {
           <div className="max-w-xl mx-auto animate-in slide-in-from-bottom-4 duration-500">
             <TodayView onSave={handleSave} />
           </div>
-        )}
-
-        {activeTab === "gallery" && (
-           <IconGallery />
         )}
       </main>
 
@@ -96,6 +112,12 @@ const Index: React.FC = () => {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         onSave={handleSave}
+      />
+
+      <SettingsModal 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)}
+        onDataChange={handleSave} 
       />
     </div>
   );
