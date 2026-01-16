@@ -14,7 +14,7 @@ const Index: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  
+
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
@@ -22,7 +22,7 @@ const Index: React.FC = () => {
   }, []);
 
   const handleDayClick = useCallback((day: DayInfo) => {
-    if (day.isFuture) return; 
+    if (day.isFuture) return;
     setSelectedDay(day);
     setIsModalOpen(true);
   }, []);
@@ -39,11 +39,11 @@ const Index: React.FC = () => {
   const stats = useMemo(() => getJournalStats(currentYear), [currentYear, refreshKey]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-mono flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* HEADER */}
       <header className="sticky top-0 z-40 w-full bg-background/90 backdrop-blur-xl border-b border-border/40">
         <div className="container max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          
+
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1">
               <button onClick={() => setCurrentYear(y => y - 1)} className="p-1 hover:bg-secondary rounded-full transition-colors text-muted-foreground">
@@ -55,10 +55,10 @@ const Index: React.FC = () => {
               </button>
             </div>
             <span className="text-muted-foreground/30 h-4 w-[1px] bg-border"></span>
-            <span className="text-sm font-medium text-muted-foreground tracking-wide hidden xs:block">daily bloom</span>
+            <span className="text-xl font-serif font-medium text-foreground tracking-wide hidden xs:block">Daily Bloom</span>
           </div>
 
-          <div className="text-xs font-mono text-muted-foreground hidden md:flex items-center gap-4">
+          <div className="text-xs font-sans text-muted-foreground hidden md:flex items-center gap-4">
             <span className="bg-secondary/50 px-3 py-1 rounded-full">
               <span className="text-foreground font-bold">{stats.written}</span> memories
             </span>
@@ -68,8 +68,8 @@ const Index: React.FC = () => {
               </span>
             )}
           </div>
-          
-          <button 
+
+          <button
             onClick={() => setIsSettingsOpen(true)}
             className="p-2 rounded-full hover:bg-secondary/80 transition-colors text-muted-foreground hover:text-primary"
           >
@@ -87,7 +87,7 @@ const Index: React.FC = () => {
               year={currentYear}
               onDayClick={handleDayClick}
             />
-            
+
             {/* Show stats if there is data */}
             {stats.written > 0 && (
               <div className="pt-8 border-t border-border/40">
@@ -114,10 +114,10 @@ const Index: React.FC = () => {
         onSave={handleSave}
       />
 
-      <SettingsModal 
-        isOpen={isSettingsOpen} 
+      <SettingsModal
+        isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
-        onDataChange={handleSave} 
+        onDataChange={handleSave}
       />
     </div>
   );

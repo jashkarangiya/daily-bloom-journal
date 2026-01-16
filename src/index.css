@@ -4,67 +4,74 @@
 
 @layer base {
   :root {
-    /* "Blueprint" Light Mode */
-    --background: 240 5% 98%; 
-    --foreground: 240 10% 3.9%;
+    /* Daily Bloom - Organic Light Mode */
+    --background: 40 20% 97%;
+    /* Warm cream paper */
+    --foreground: 160 30% 15%;
+    /* Deep forest green text */
 
-    /* High Contrast Primary (Deep Blue or Black) */
-    --primary: 240 95% 35%; 
-    --primary-foreground: 0 0% 98%;
+    --primary: 160 30% 15%;
+    /* Deep forest ink */
+    --primary-foreground: 40 20% 97%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 160 30% 15%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    
-    --destructive: 0 84.2% 60.2%;
+    --popover-foreground: 160 30% 15%;
+
+    --secondary: 150 15% 94%;
+    /* Soft sage tint */
+    --secondary-foreground: 160 30% 15%;
+
+    --muted: 30 15% 94%;
+    /* Warm stone */
+    --muted-foreground: 25 10% 45%;
+    /* Clay gray */
+
+    --accent: 14 30% 92%;
+    /* Soft petal pink */
+    --accent-foreground: 160 30% 15%;
+
+    --destructive: 0 60% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 95% 35%;
-    
-    --radius: 0.75rem;
+    --border: 30 10% 85%;
+    --input: 30 10% 85%;
+    --ring: 160 20% 40%;
 
-    /* Removed Rainbow Moods - Enforcing Monochrome */
-    --garden-ink: 240 95% 35%;
+    --radius: 1rem;
+    /* Softer, rounder corners */
   }
 
   .dark {
-    /* "Chalkboard" Dark Mode */
-    --background: 240 10% 10%;
-    --foreground: 0 0% 98%;
+    /* Night Garden - Organic Dark Mode */
+    --background: 160 30% 8%;
+    /* Very deep green */
+    --foreground: 40 10% 90%;
+    /* Parchment text */
 
-    --primary: 0 0% 98%; /* White ink in dark mode */
-    --primary-foreground: 240 5.9% 10%;
+    --primary: 40 10% 90%;
+    --primary-foreground: 160 30% 10%;
 
-    --card: 240 10% 12%;
-    --card-foreground: 0 0% 98%;
-    
-    --popover: 240 10% 12%;
-    --popover-foreground: 0 0% 98%;
+    --card: 160 25% 10%;
+    --card-foreground: 40 10% 90%;
 
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
+    --popover: 160 25% 10%;
+    --popover-foreground: 40 10% 90%;
 
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    --secondary: 160 20% 15%;
+    --secondary-foreground: 40 10% 90%;
 
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
+    --muted: 160 20% 15%;
+    --muted-foreground: 160 10% 60%;
 
-    --border: 240 3.7% 20%; /* Visible borders in dark mode */
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    --accent: 160 20% 15%;
+    --accent-foreground: 40 10% 90%;
+
+    --border: 160 20% 20%;
+    --input: 160 20% 20%;
+    --ring: 160 20% 40%;
   }
 }
 
@@ -72,20 +79,31 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground font-mono antialiased;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif;
   }
 }
 
 @layer utilities {
   /* Fix for "Vanished" Icons: Ensure explicit stroke/fill behavior */
-  
+
   .plant-filled {
     /* Solid color for filled icons */
     fill: currentColor;
     stroke: none;
   }
-  
+
   .plant-outlined {
     /* Outline for empty icons */
     fill: none;
@@ -114,7 +132,14 @@
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
