@@ -14,8 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        mono: ["Space Mono", "JetBrains Mono", "monospace"],
-        display: ["Space Mono", "monospace"],
+        sans: ["Outfit", "sans-serif"],
+        serif: ["Playfair Display", "serif"],
+        mono: ["Space Mono", "monospace"], // Keeping for technical details if needed
       },
       colors: {
         border: "hsl(var(--border))",
@@ -52,13 +53,12 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         garden: {
-          cream: "hsl(var(--garden-cream))",
-          paper: "hsl(var(--garden-paper))",
-          ink: "hsl(var(--garden-ink))",
-          "ink-light": "hsl(var(--garden-ink-light))",
-          "ink-muted": "hsl(var(--garden-ink-muted))",
-          shadow: "hsl(var(--garden-shadow))",
-          dotted: "hsl(var(--garden-dotted))",
+          cream: "#F9F7F1",
+          sage: "#8DA399",
+          moss: "#4A5D53",
+          deep: "#1A2F25",
+          clay: "#E6D5CC",
+          terra: "#C5AFA0",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
