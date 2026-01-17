@@ -10,10 +10,14 @@ import {
   formatDate,
   MoodType
 } from "@/lib/journalData";
-import { 
-  Camera, X, 
-  Sun, Flower2, Leaf, Cloud, Moon, CloudRain 
+import {
+  Camera, X,
+  Sun, Flower2, Leaf, Cloud, Moon, CloudRain,
+  Settings2, Check
 } from "lucide-react";
+import { Habit, HabitLog, getHabitsFromStorage } from "@/lib/journalData";
+import { HabitManager } from "./HabitManager";
+import { cn } from "@/lib/utils";
 
 interface TodayViewProps {
   onSave: () => void;
@@ -23,7 +27,7 @@ export const TodayView: React.FC<TodayViewProps> = ({ onSave }) => {
   const today = useMemo(() => new Date(), []);
   const dayOfYear = getDayOfYear(today);
   const dateStr = formatDate(today);
-  
+
   const [content, setContent] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
   const [mood, setMood] = useState<MoodType>('good');
@@ -31,15 +35,46 @@ export const TodayView: React.FC<TodayViewProps> = ({ onSave }) => {
   const [showSuccess, setShowSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // HABIT TRACKING STATE
+  const [habits, setHabits] = useState<Habit[]>([]);
+  const [habitLogs, setHabitLogs] = useState<Record<string, HabitLog>>({});
+  const [isHabitManagerOpen, setIsHabitManagerOpen] = useState(false);
+
   useEffect(() => {
+    // Load existing entry data
     const entries = getEntriesFromStorage();
     if (entries[dateStr]) {
       setContent(entries[dateStr].content);
       setPhotos(entries[dateStr].photos || []);
       setMood(entries[dateStr].mood || 'good');
+      setHabitLogs(entries[dateStr].habits || {});
     }
+
+    // Load habits definition
+    setHabits(getHabitsFromStorage());
   }, [dateStr]);
 
+  const refreshHabits = () => {
+    setHabits(getHabitsFromStorage());
+  };
+
+  const toggleHabit = (habitId: string) => {
+    setHabitLogs(prev => {
+      const current = prev[habitId];
+      if (current) {
+        const next = { ...prev };
+        delete next[habitId];
+        return next;
+      } else {
+        return {
+          ...prev,
+          [habitId]: { completed: true }
+        };
+      }
+    });
+  };
+
+  // ... (mood functions) ...
   const cycleMood = () => {
     const moods: MoodType[] = ['amazing', 'good', 'calm', 'neutral', 'tired', 'rough'];
     const currentIndex = moods.indexOf(mood || 'good');
@@ -89,21 +124,22 @@ export const TodayView: React.FC<TodayViewProps> = ({ onSave }) => {
   };
 
   const handleSave = async () => {
-    if (!content.trim() && photos.length === 0) return;
+    if (!content.trim() && photos.length === 0 && Object.keys(habitLogs).length === 0) return;
     setIsSaving(true);
-    
+
     const entry: JournalEntry = {
       date: dateStr,
       content: content.trim(),
       photos: photos,
       mood: mood,
+      habits: habitLogs,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
     saveEntryToStorage(entry);
     await new Promise((resolve) => setTimeout(resolve, 400));
-    
+
     setIsSaving(false);
     setShowSuccess(true);
     onSave();
@@ -113,12 +149,12 @@ export const TodayView: React.FC<TodayViewProps> = ({ onSave }) => {
   return (
     <div className="page-transition max-w-lg mx-auto">
       <div className="bg-background border-border rounded-3xl p-6 shadow-sm border">
-        
+
         {/* HEADER */}
         <div className="flex items-start justify-between pb-6">
-          
+
           {/* MATCHING MOOD PICKER STYLE */}
-          <button 
+          <button
             onClick={cycleMood}
             className="flex flex-col items-center justify-center w-20 h-24 rounded-2xl border-2 border-primary/20 bg-card hover:bg-secondary/30 hover:border-primary transition-all duration-200 group"
             title="Tap to change mood"
@@ -141,6 +177,46 @@ export const TodayView: React.FC<TodayViewProps> = ({ onSave }) => {
             <p className="font-mono text-3xl font-bold text-primary tracking-tighter">
               {today.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })}
             </p>
+          </div>
+        </div>
+
+        {/* IN-CARD HABIT TRACKER */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-mono uppercase tracking-widest text-muted-foreground font-bold">Daily Habits</h3>
+            <button onClick={() => setIsHabitManagerOpen(true)} className="p-1 text-muted-foreground hover:text-primary transition-colors">
+              <Settings2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {habits.map(habit => {
+              const log = habitLogs[habit.id];
+              return (
+                <button
+                  key={habit.id}
+                  onClick={() => toggleHabit(habit.id)}
+                  className={cn(
+                    "flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all duration-200 relative overflow-hidden group aspect-square",
+                    log
+                      ? "bg-primary/10 border-primary"
+                      : "bg-background border-border hover:border-border/80"
+                  )}
+                >
+                  <span className="text-xl mb-1 group-hover:scale-110 transition-transform">{habit.emoji}</span>
+                  <div className={cn(
+                    "absolute top-1 right-1 transition-all duration-300",
+                    log ? "opacity-100 scale-100 text-primary" : "opacity-0 scale-50"
+                  )}>
+                    <Check className="w-3 h-3" strokeWidth={3} />
+                  </div>
+                </button>
+              );
+            })}
+            {habits.length === 0 && (
+              <button onClick={() => setIsHabitManagerOpen(true)} className="col-span-4 py-3 text-xs text-muted-foreground italic border border-dashed border-border rounded-xl">
+                Add habits...
+              </button>
+            )}
           </div>
         </div>
 
@@ -175,17 +251,23 @@ export const TodayView: React.FC<TodayViewProps> = ({ onSave }) => {
             className="min-h-[180px] resize-none bg-transparent border-none text-lg text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-0 p-0 leading-relaxed font-mono"
           />
           <div className="flex justify-between items-center pt-4 border-t border-border/20">
-             <span className="text-[10px] font-mono text-muted-foreground">{content.length} chars</span>
-             <Button
-                onClick={handleSave}
-                disabled={(!content.trim() && photos.length === 0) || isSaving}
-                className="rounded-full px-8 bg-primary text-primary-foreground hover:bg-primary/90 font-mono text-xs h-10 transition-all shadow-lg shadow-primary/20"
-              >
-                {isSaving ? "saving..." : showSuccess ? "saved" : "done"}
-              </Button>
+            <span className="text-[10px] font-mono text-muted-foreground">{content.length} chars</span>
+            <Button
+              onClick={handleSave}
+              disabled={(!content.trim() && photos.length === 0) || isSaving}
+              className="rounded-full px-8 bg-primary text-primary-foreground hover:bg-primary/90 font-mono text-xs h-10 transition-all shadow-lg shadow-primary/20"
+            >
+              {isSaving ? "saving..." : showSuccess ? "saved" : "done"}
+            </Button>
           </div>
         </div>
       </div>
+
+      <HabitManager
+        isOpen={isHabitManagerOpen}
+        onClose={() => setIsHabitManagerOpen(false)}
+        onUpdate={refreshHabits}
+      />
     </div>
   );
 };

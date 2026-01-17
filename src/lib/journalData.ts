@@ -2,11 +2,24 @@
 // EXPANDED MOODS: 6 distinct states
 export type MoodType = 'amazing' | 'good' | 'calm' | 'neutral' | 'tired' | 'rough' | null;
 
+export interface Habit {
+  id: string;
+  name: string;
+  emoji: string;
+  isActive: boolean;
+}
+
+export interface HabitLog {
+  completed: boolean;
+  note?: string;
+}
+
 export interface JournalEntry {
   date: string; // YYYY-MM-DD
   content: string;
   mood: MoodType;
   photos?: string[]; // Array of photo URLs/base64
+  habits?: Record<string, HabitLog>; // habitId -> log
   createdAt: Date;
   updatedAt: Date;
 }
@@ -66,17 +79,17 @@ export const isFutureDate = (date: Date): boolean => {
 // Helper to get days grouped by month for the grid view
 export const getMonthsInYear = (year: number): { name: string; days: DayInfo[] }[] => {
   const months = [];
-  
+
   for (let m = 0; m < 12; m++) {
     const date = new Date(year, m, 1);
     const monthName = date.toLocaleDateString('en-US', { month: 'long' });
     const daysInMonth: DayInfo[] = [];
-    
+
     while (date.getMonth() === m) {
       const dateStr = formatDate(date);
       const entries = getEntriesFromStorage();
       const entry = entries[dateStr];
-      
+
       daysInMonth.push({
         date: new Date(date),
         dayOfYear: getDayOfYear(date),
@@ -96,13 +109,43 @@ export const getMonthsInYear = (year: number): { name: string; days: DayInfo[] }
 
 // Local storage helpers
 const STORAGE_KEY = 'garden-journal-entries';
+const STORAGE_KEY_HABITS = 'garden-habits';
+
+export const getHabitsFromStorage = (): Habit[] => {
+  if (typeof window === 'undefined') return [];
+  const stored = localStorage.getItem(STORAGE_KEY_HABITS);
+  if (!stored) return [];
+  try {
+    return JSON.parse(stored);
+  } catch {
+    return [];
+  }
+};
+
+export const saveHabitsToStorage = (habits: Habit[]): void => {
+  localStorage.setItem(STORAGE_KEY_HABITS, JSON.stringify(habits));
+};
+
+export const initializeDefaultHabits = (): Habit[] => {
+  const current = getHabitsFromStorage();
+  if (current.length > 0) return current;
+
+  const defaults: Habit[] = [
+    { id: 'water', name: 'Hydrate', emoji: '💧', isActive: true },
+    { id: 'read', name: 'Read', emoji: '📚', isActive: true },
+    { id: 'exercise', name: 'Move', emoji: '🏃', isActive: true },
+    { id: 'meditate', name: 'Mindfulness', emoji: '🧘', isActive: true },
+  ];
+  saveHabitsToStorage(defaults);
+  return defaults;
+};
 
 export const getEntriesFromStorage = (): Record<string, JournalEntry> => {
   if (typeof window === 'undefined') return {};
-  
+
   const stored = localStorage.getItem(STORAGE_KEY);
   if (!stored) return {};
-  
+
   try {
     const parsed = JSON.parse(stored);
     Object.keys(parsed).forEach(key => {
@@ -131,13 +174,13 @@ export const deleteEntryFromStorage = (date: string): void => {
 export const getJournalStats = (year: number): { written: number; remaining: number; streak: number } => {
   const entries = getEntriesFromStorage();
   const yearEntries = Object.keys(entries).filter(date => date.startsWith(year.toString()));
-  
+
   let currentStreak = 0;
   const today = new Date();
-  
+
   let checkDate = new Date(today);
   let dateStr = formatDate(checkDate);
-  
+
   if (!entries[dateStr]) {
     checkDate.setDate(checkDate.getDate() - 1);
     dateStr = formatDate(checkDate);
@@ -160,5 +203,5 @@ export const getJournalStats = (year: number): { written: number; remaining: num
 };
 
 export const initializeJournal = (): void => {
-  // Start fresh
+  initializeDefaultHabits();
 };

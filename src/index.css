@@ -45,32 +45,37 @@
   }
 
   .dark {
-    /* Night Garden - Organic Dark Mode */
-    --background: 160 30% 8%;
-    /* Very deep green */
-    --foreground: 40 10% 90%;
-    /* Parchment text */
+    /* Night Garden - Organic Dark Mode (Refined) */
+    --background: 160 30% 6%;
+    /* Deeper, rich charcoal-green */
+    --foreground: 40 15% 85%;
+    /* Soft antique parchment */
 
-    --primary: 40 10% 90%;
+    --primary: 40 15% 85%;
+    /* Matching text */
     --primary-foreground: 160 30% 10%;
 
-    --card: 160 25% 10%;
-    --card-foreground: 40 10% 90%;
+    --card: 160 25% 9%;
+    /* Slightly lighter than bg */
+    --card-foreground: 40 15% 85%;
 
-    --popover: 160 25% 10%;
-    --popover-foreground: 40 10% 90%;
+    --popover: 160 25% 9%;
+    --popover-foreground: 40 15% 85%;
 
-    --secondary: 160 20% 15%;
-    --secondary-foreground: 40 10% 90%;
+    --secondary: 160 20% 14%;
+    /* Subtle greenish-grey for interactivity */
+    --secondary-foreground: 40 15% 85%;
 
-    --muted: 160 20% 15%;
-    --muted-foreground: 160 10% 60%;
+    --muted: 160 20% 14%;
+    --muted-foreground: 160 10% 50%;
+    /* Softer muted text */
 
-    --accent: 160 20% 15%;
-    --accent-foreground: 40 10% 90%;
+    --accent: 160 25% 14%;
+    --accent-foreground: 40 15% 85%;
 
-    --border: 160 20% 20%;
-    --input: 160 20% 20%;
+    --border: 160 15% 18%;
+    /* Subtle border */
+    --input: 160 15% 18%;
     --ring: 160 20% 40%;
   }
 }
