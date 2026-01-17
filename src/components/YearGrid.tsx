@@ -22,16 +22,20 @@ export const YearGrid: React.FC<YearGridProps> = ({ year, onDayClick }) => {
               </h3>
 
               <div className="grid grid-cols-7 gap-1 mb-1 px-1">
-                {['S','M','T','W','T','F','S'].map((d, i) => (
+                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
                   <span key={i} className="text-[10px] text-center text-muted-foreground/30 font-mono select-none">{d}</span>
                 ))}
               </div>
 
-              <div className="grid grid-cols-7 gap-1 p-3 bg-secondary/20 rounded-2xl border border-border/40">
+              {/* FIXED GRID: 6 ROWS * 7 COLS = 42 CELLS TOTAL */}
+              <div className="grid grid-cols-7 gap-1 p-3 bg-secondary/20 rounded-2xl border border-border/40 min-h-[240px] content-start pb-4">
+
+                {/* Empty cells for offset */}
                 {Array.from({ length: month.days[0].date.getDay() }).map((_, i) => (
                   <div key={`empty-${i}`} className="w-8 h-8" />
                 ))}
 
+                {/* Actual days */}
                 {month.days.map((day) => (
                   <Tooltip key={day.dayOfYear}>
                     <TooltipTrigger asChild>
